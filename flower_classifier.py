@@ -5,22 +5,21 @@ from torch import optim
 from torchvision import datasets, transforms, models
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from workspace_utils import active_session
 from process_image import process_image
 
 class Flower_Classifier(ABC):
     """
-    A abstract class to represent classifier flower. A concrete class must 
-    implement _set_input_size and _set_model methods to specific ImageNet 
-    model spacific implementation. Method _set_input_size should set the 
-    input size of the model and _set_model method should instantiate 
+    A abstract class to represent classifier flower. A concrete class must
+    implement _set_input_size and _set_model methods to specific ImageNet
+    model spacific implementation. Method _set_input_size should set the
+    input size of the model and _set_model method should instantiate
     desired model e.g.
-    
-        self._input_size = 9216 or 
-        self._input_size = self._model.classifier.in_features 
-        
+
+        self._input_size = 9216 or
+        self._input_size = self._model.classifier.in_features
+
         self._model = models.alexnet(pretrained=True)
-    
+
     Extending this class, concrete class can be used to both training and
     predicting.
     """
@@ -40,7 +39,7 @@ class Flower_Classifier(ABC):
         """
         Init method is resposible to initialize certain attributes which
         are used through out processing.
-        
+
         Parameters:
             data_dir_or_path - This is path to the directory where the flowers
                             are stored
@@ -62,7 +61,7 @@ class Flower_Classifier(ABC):
         self._set_input_size()
         self._set_data_transforms()
         self._set_image_datasets()
-        self._set_dataloaders()     
+        self._set_dataloaders()
 
     @property
     def save_dir(self):
@@ -74,7 +73,7 @@ class Flower_Classifier(ABC):
             self._save_dir_or_path = save_dir_or_path
         else:
             raise Exception('Not a valid directory to save the checkpoint: {}'.format(save_dir))
-    
+
     @property
     def input_size(self):
         return self._input_size
@@ -82,7 +81,7 @@ class Flower_Classifier(ABC):
     @abstractmethod
     def _set_input_size(self):
         self._input_size = 25088
-    
+
     @property
     def learning_rate(self):
         return self._learning_rate
@@ -174,14 +173,14 @@ class Flower_Classifier(ABC):
 
     def train(self):
         """
-        This method is drive the training process. Unless overriden in concrete 
+        This method is drive the training process. Unless overriden in concrete
         implementation, by default training is only available when execution mode
-        is set to train. 
-        
+        is set to train.
+
         Method before starts training given model, freezes parameters, applies
         defined classifier, set loss criterion, and set optimizer. Then starts
         training.
-        
+
         Parameters:
             self
         Return:
@@ -203,7 +202,7 @@ class Flower_Classifier(ABC):
 
     def define_classifier(self):
         """
-        This method defines default classifier. Method must be overridden in 
+        This method defines default classifier. Method must be overridden in
         concrete implementation for that specific classfication definition.
 
         Parameters:
@@ -224,7 +223,7 @@ class Flower_Classifier(ABC):
 
     def _loss_criterion(self):
         """
-        This method sets default loss criterion. Method must be overridden in 
+        This method sets default loss criterion. Method must be overridden in
         concrete implementation for that specific implementation.
 
         Parameters:
@@ -236,7 +235,7 @@ class Flower_Classifier(ABC):
 
     def _set_optimizer(self):
         """
-        This method sets default optimizer using predefined learning rate. Method must be overridden in 
+        This method sets default optimizer using predefined learning rate. Method must be overridden in
         concrete implementation for that specific implementation. learning rate can be changed in concrete
         implementation as using setter method.
 
@@ -261,49 +260,49 @@ class Flower_Classifier(ABC):
             device = "cuda"
         else:
             device = "cpu"
-         
+
         self._model.to(device);
-        with active_session():
-            #Training this model
-            epochs = self._epochs
-            print('Using device: {}'.format(device))
-            for e in range(epochs):
-                print("Epoch: {}/{}.. ".format(e+1, epochs))
-                running_loss = 0
-                for images, labels in self._dataloaders['train']:
-                    images, labels = images.to(device), labels.to(device)
-                    self._optimizer.zero_grad()
-                    logps = self._model.forward(images)
-                    loss = self._criterion(logps, labels)
-                    loss.backward()
-                    self._optimizer.step()
-                    running_loss += loss.item()
-                else:
-                    validation_loss = 0
-                    accuracy = 0
-                    with torch.no_grad():
-                        self._model.eval()
-                        for images, labels in self._dataloaders['valid']:
-                            images, labels = images.to(device), labels.to(device)
-                            
-                            validation_logps = self._model(images)
-                            loss = self._criterion(validation_logps, labels)
-                            validation_loss += loss.item()
 
-                            validation_ps = torch.exp(validation_logps)
-                            top_p, top_class = validation_ps.topk(1, dim=1)
-                            equals = top_class == labels.view(*top_class.shape)
-                            accuracy += torch.mean(equals.type(torch.FloatTensor))
+        #Training this model
+        epochs = self._epochs
+        print('Using device: {}'.format(device))
+        for e in range(epochs):
+            print("Epoch: {}/{}.. ".format(e+1, epochs))
+            running_loss = 0
+            for images, labels in self._dataloaders['train']:
+                images, labels = images.to(device), labels.to(device)
+                self._optimizer.zero_grad()
+                logps = self._model.forward(images)
+                loss = self._criterion(logps, labels)
+                loss.backward()
+                self._optimizer.step()
+                running_loss += loss.item()
+            else:
+                validation_loss = 0
+                accuracy = 0
+                with torch.no_grad():
+                    self._model.eval()
+                    for images, labels in self._dataloaders['valid']:
+                        images, labels = images.to(device), labels.to(device)
 
-                    self._model.train()
-                    print("Training Loss: {:.3f}.. ".format(running_loss/len(self._dataloaders['train'])),
-                          "Validation Loss: {:.3f}.. ".format(validation_loss/len(self._dataloaders['valid'])),
-                          "Validation Accuracy: {:.3f}".format(accuracy/len(self._dataloaders['valid']) * 100))
+                        validation_logps = self._model(images)
+                        loss = self._criterion(validation_logps, labels)
+                        validation_loss += loss.item()
 
-            print("Done training")
-            #Save checkpoint once the training complete
-            self._checkpoint()
-    
+                        validation_ps = torch.exp(validation_logps)
+                        top_p, top_class = validation_ps.topk(1, dim=1)
+                        equals = top_class == labels.view(*top_class.shape)
+                        accuracy += torch.mean(equals.type(torch.FloatTensor))
+
+                self._model.train()
+                print("Training Loss: {:.3f}.. ".format(running_loss/len(self._dataloaders['train'])),
+                      "Validation Loss: {:.3f}.. ".format(validation_loss/len(self._dataloaders['valid'])),
+                      "Validation Accuracy: {:.3f}".format(accuracy/len(self._dataloaders['valid']) * 100))
+
+        print("Done training")
+        #Save checkpoint once the training complete
+        self._checkpoint()
+
     def _checkpoint(self):
         """
         This method saves the checkpoint under default directory checkpoints if no other directory
@@ -329,7 +328,7 @@ class Flower_Classifier(ABC):
         if self._save_dir is not None or self._save_dir != '':
             torch.save(checkpoint, self._save_dir + '/' + self.__class__.__name__ + '.pth')
             print("Checkpoint has been saved at: {}".format(self._save_dir + '/' +  self.__class__.__name__ + '.pth'))
-            
+
     def predict(self, image_path, topk=5):
         """
         This method predicts the class (or classes) of an image using a trained deep learning model.
@@ -347,7 +346,7 @@ class Flower_Classifier(ABC):
         logps = self._model(img)
         ps = torch.exp(logps)
         return ps.topk(topk, dim=1)
-    
+
     def _display_execution_details(self):
         print('== Execution Details ==')
         #print('Model defined: ', self._model)

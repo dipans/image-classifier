@@ -2,7 +2,6 @@ from flower_classifier import Flower_Classifier
 from torchvision import models
 from torch import nn, optim
 from collections import OrderedDict
-from workspace_utils import active_session
 import torch
 
 #This is the available model archs for flower classification, any addition
@@ -81,7 +80,7 @@ def instantiate_new_model(in_args):
 def get_model_instance(in_args):
     """
     This function responsible to instantiate appropriate classifier based on the
-    model architecture by calling instantiate_new_model function. It also 
+    model architecture by calling instantiate_new_model function. It also
     validates across the validity of the data directory and if arch is supported
     by this implementation
 
@@ -97,17 +96,17 @@ def get_model_instance(in_args):
         raise Exception('Model is not supported')
     else:
         return instantiate_new_model(in_args)
-    
+
 class Alexnet_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use alexnet 
+    This is a concrete implementation of Flower_Classifier to use alexnet
     """
     def __init__(self, *args, **kwargs):
         super(Alexnet_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.alexnet(pretrained=True)
-    
+
     def define_classifier(self):
         self._model.classifier = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -123,69 +122,69 @@ class Alexnet_Classifier(Flower_Classifier):
 
 class VGG11_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use vgg11 
+    This is a concrete implementation of Flower_Classifier to use vgg11
     """
     def __init__(self, *args, **kwargs):
         super(VGG11_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.vgg11(pretrained=True)
-    
+
     def _set_input_size(self):
         self._input_size = 25088
 
 class VGG13_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use vgg13 
+    This is a concrete implementation of Flower_Classifier to use vgg13
     """
     def __init__(self, *args, **kwargs):
         super(VGG13_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.vgg13(pretrained=True)
-    
+
     def _set_input_size(self):
         self._input_size = 25088
 
 class VGG16_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use vgg16 
+    This is a concrete implementation of Flower_Classifier to use vgg16
     """
     def __init__(self, *args, **kwargs):
         super(VGG16_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.vgg16(pretrained=True)
-        
+
     def _set_input_size(self):
         self._input_size = 25088
 
 class VGG19_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use vgg19 
+    This is a concrete implementation of Flower_Classifier to use vgg19
     """
     def __init__(self, *args, **kwargs):
         super(VGG19_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.vgg19(pretrained=True)
-        
+
     def _set_input_size(self):
         self._input_size = 25088
 
 class Resnet18_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use resnet18 
+    This is a concrete implementation of Flower_Classifier to use resnet18
     """
     def __init__(self, *args, **kwargs):
         super(Resnet18_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.resnet18(pretrained=True)
-        
+
     def _set_input_size(self):
         self._input_size = 512
-        
+
     def define_classifier(self):
         self._model.fc = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hi9216dden_units)),
@@ -196,7 +195,7 @@ class Resnet18_Classifier(Flower_Classifier):
                           ('fc3', nn.Linear(self._hidden_units, 102)),
                           ('output', nn.LogSoftmax(dim=1))
                           ]))
-        
+
     def _set_optimizer(self):
         self._optimizer = optim.Adam(self._model.fc.parameters(), lr=self._learning_rate)
 
@@ -209,10 +208,10 @@ class Resnet34_Classifier(Flower_Classifier):
 
     def _set_model(self):
         self._model = models.resnet34(pretrained=True)
-        
+
     def _set_input_size(self):
         self._input_size = 512
-        
+
     def define_classifier(self):
         self._model.fc = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -223,23 +222,23 @@ class Resnet34_Classifier(Flower_Classifier):
                           ('fc3', nn.Linear(self._hidden_units, 102)),
                           ('output', nn.LogSoftmax(dim=1))
                           ]))
-        
+
     def _set_optimizer(self):
         self._optimizer = optim.Adam(self._model.fc.parameters(), lr=self._learning_rate)
 
 class Resnet50_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use resnet50 
+    This is a concrete implementation of Flower_Classifier to use resnet50
     """
     def __init__(self, *args, **kwargs):
         super(Resnet50_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.resnet50(pretrained=True)
-        
+
     def _set_input_size(self):
         self._input_size = 2048
-        
+
     def define_classifier(self):
         self._model.fc = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -250,23 +249,23 @@ class Resnet50_Classifier(Flower_Classifier):
                           ('fc3', nn.Linear(self._hidden_units, 102)),
                           ('output', nn.LogSoftmax(dim=1))
                           ]))
-        
+
     def _set_optimizer(self):
         self._optimizer = optim.Adam(self._model.fc.parameters(), lr=self._learning_rate)
-      
+
 class Resnet101_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use resnet101 
+    This is a concrete implementation of Flower_Classifier to use resnet101
     """
     def __init__(self, *args, **kwargs):
         super(Resnet101_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.resnet101(pretrained=True)
-        
+
     def _set_input_size(self):
         self._input_size = 2048
-        
+
     def define_classifier(self):
         self._model.fc = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -277,23 +276,23 @@ class Resnet101_Classifier(Flower_Classifier):
                           ('fc3', nn.Linear(self._hidden_units, 102)),
                           ('output', nn.LogSoftmax(dim=1))
                           ]))
-        
+
     def _set_optimizer(self):
         self._optimizer = optim.Adam(self._model.fc.parameters(), lr=self._learning_rate)
 
 class Resnet152_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use resnet152 
+    This is a concrete implementation of Flower_Classifier to use resnet152
     """
     def __init__(self, *args, **kwargs):
         super(Resnet152_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.resnet152(pretrained=True)
-        
+
     def _set_input_size(self):
         self._input_size = 2048
-        
+
     def define_classifier(self):
         self._model.fc = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -304,21 +303,21 @@ class Resnet152_Classifier(Flower_Classifier):
                           ('fc3', nn.Linear(self._hidden_units, 102)),
                           ('output', nn.LogSoftmax(dim=1))
                           ]))
-        
+
     def _set_optimizer(self):
         self._optimizer = optim.Adam(self._model.fc.parameters(), lr=self._learning_rate)
 
 
 class Densenet121_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use densenet121 
+    This is a concrete implementation of Flower_Classifier to use densenet121
     """
     def __init__(self, *args, **kwargs):
         super(Densenet121_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.densenet121(pretrained=True)
-    
+
     def define_classifier(self):
         self._model.classifier = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -331,18 +330,18 @@ class Densenet121_Classifier(Flower_Classifier):
                           ]))
     def _set_input_size(self):
         #1024
-        self._input_size = self._model.classifier.in_features        
-        
+        self._input_size = self._model.classifier.in_features
+
 class Densenet161_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use densenet161 
+    This is a concrete implementation of Flower_Classifier to use densenet161
     """
     def __init__(self, *args, **kwargs):
         super(Densenet161_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.densenet161(pretrained=True)
-    
+
     def define_classifier(self):
         self._model.classifier = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -353,18 +352,18 @@ class Densenet161_Classifier(Flower_Classifier):
                           ]))
     def _set_input_size(self):
         #2208
-        self._input_size = self._model.classifier.in_features        
-        
+        self._input_size = self._model.classifier.in_features
+
 class Densenet169_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use densenet169 
+    This is a concrete implementation of Flower_Classifier to use densenet169
     """
     def __init__(self, *args, **kwargs):
         super(Densenet169_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.densenet169(pretrained=True)
-    
+
     def define_classifier(self):
         self._model.classifier = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -377,18 +376,18 @@ class Densenet169_Classifier(Flower_Classifier):
                           ]))
     def _set_input_size(self):
         #1664
-        self._input_size = self._model.classifier.in_features       
-        
+        self._input_size = self._model.classifier.in_features
+
 class Densenet201_Classifier(Flower_Classifier):
     """
-    This is a concrete implementation of Flower_Classifier to use densenet201 
+    This is a concrete implementation of Flower_Classifier to use densenet201
     """
     def __init__(self, *args, **kwargs):
         super(Densenet201_Classifier, self).__init__(*args, **kwargs)
 
     def _set_model(self):
         self._model = models.densenet201(pretrained=True)
-    
+
     def define_classifier(self):
         self._model.classifier = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(self._input_size, self._hidden_units)),
@@ -399,6 +398,4 @@ class Densenet201_Classifier(Flower_Classifier):
                           ]))
     def _set_input_size(self):
         #1920
-        self._input_size = self._model.classifier.in_features 
-
-        
+        self._input_size = self._model.classifier.in_features
